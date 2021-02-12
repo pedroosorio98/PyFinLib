@@ -55,6 +55,10 @@ def underwater(rets):
         return performance/performance.cummax()-1
     else:
         raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
+        
+def plot_underwater(rets):
+    underwater(rets).plot.area(figsize=(16,6))
+    plt.legend()
 
 def max_drawdown(rets):
     if isinstance(rets,pd.Series) or isinstance(rets,pd.DataFrame):
