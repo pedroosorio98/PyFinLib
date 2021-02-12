@@ -57,8 +57,16 @@ def underwater(rets):
         raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
         
 def plot_underwater(rets):
-    underwater(rets).plot.area(figsize=(16,6))
-    plt.legend()
+    if isinstance(rets,pd.Series):
+        underw = underwater(rets)
+        underw.plot.area(figsize=(16,5))
+    elif isinstance(rets,pd.DataFrame):
+        underw = underwater(rets)
+        for i in rets.columns:
+            underw[i].plot.area(figsize=(16,6))
+        plt.legend(loc="lower left")
+    else:
+        raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
 
 def max_drawdown(rets):
     if isinstance(rets,pd.Series) or isinstance(rets,pd.DataFrame):
@@ -314,3 +322,11 @@ def vol_weighted_weights(rets,look_back_days=252,reb_days=30):
         
 def get_fedfunds(start_date=None,end_date=None):
     return qdl.get('FRED/FEDFUNDS',start_date=start_date,end_date=end_date)
+
+def plot_weights(weights):
+    if isinstance(weights,pd.DataFrame):
+        weights.plot.area(figsize=(16,6))
+        plt.legend(loc="upper left");
+    else:
+        raise TypeError("This function is supposed to receive a pd.DataFrame object")
+        
