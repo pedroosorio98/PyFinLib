@@ -330,3 +330,13 @@ def plot_weights(weights):
     else:
         raise TypeError("This function is supposed to receive a pd.DataFrame object")
         
+def ew_weighted_weights(rets,reb_days=30):
+    if isinstance(rets,pd.DataFrame):
+        ew_signal = rets.copy()
+        ew_signal[:] = 1
+        ew_signal = ew_signal.iloc[::reb_days]
+        reb_weights = ew_signal.div(ew_signal.sum(axis=1),axis=0)
+        return expand_weights(rets,reb_weights)
+    else:
+        raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
+        
