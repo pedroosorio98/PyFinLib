@@ -262,7 +262,7 @@ def rets_yearly_returns(rets):
         raise TypeError("This function is supposed to receive a pd.DataFrame object.")
         
 def get_nefin_data():
-    return pd.read_csv("PyFinLib Data/NEFIN Data.csv",index_col=0,parse_dates=True)
+    return pd.read_csv("Data/NEFIN Data.csv",index_col=0,parse_dates=True)
 
 def get_fammafrench_names():
     return pdr.famafrench.get_available_datasets()
