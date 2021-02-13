@@ -300,10 +300,10 @@ def expand_weights(rets,reb_weights):
     else:
          raise TypeError("This function is supposed to receive two pd.DataFrame objects.")
             
-def momentum_weighted_weights(rets,gamma,look_back_days=252,reb_days=30):
+def momentum_weighted_weights(rets,gamma,look_back_days=252,reb_days=30,leverage=1):
     if isinstance(rets,pd.DataFrame):
         momentum_signal = np.exp(gamma*performance_index(rets).pct_change(look_back_days).dropna(how="all").iloc[::reb_days])
-        reb_weights = momentum_signal.div(momentum_signal.sum(axis=1),axis=0)
+        reb_weights = momentum_signal.div(momentum_signal.sum(axis=1),axis=0)*leverage
         return expand_weights(rets,reb_weights).iloc[look_back_days:]
     else:
         raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
@@ -312,10 +312,10 @@ def strategy_returns(rets,weights):
     rets = rets.loc[weights.index[0]:]
     return rets.mul(weights.shift(1),axis=1).sum(axis=1)
 
-def vol_weighted_weights(rets,look_back_days=252,reb_days=30):
+def vol_weighted_weights(rets,look_back_days=252,reb_days=30,leverage=1):
     if isinstance(rets,pd.DataFrame):
         vol_signal = (rets.rolling(look_back_days).std().dropna(how="all").iloc[::reb_days])**(-1)
-        reb_weights = vol_signal.div(vol_signal.sum(axis=1),axis=0)
+        reb_weights = vol_signal.div(vol_signal.sum(axis=1),axis=0)*leverage
         return expand_weights(rets,reb_weights).iloc[look_back_days:]
     else:
         raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
@@ -330,12 +330,12 @@ def plot_weights(weights):
     else:
         raise TypeError("This function is supposed to receive a pd.DataFrame object")
         
-def ew_weighted_weights(rets,reb_days=30):
+def ew_weighted_weights(rets,reb_days=30,leverage=1):
     if isinstance(rets,pd.DataFrame):
         ew_signal = rets.copy()
         ew_signal[:] = 1
         ew_signal = ew_signal.iloc[::reb_days]
-        reb_weights = ew_signal.div(ew_signal.sum(axis=1),axis=0)
+        reb_weights = ew_signal.div(ew_signal.sum(axis=1),axis=0)*leverage
         return expand_weights(rets,reb_weights)
     else:
         raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
