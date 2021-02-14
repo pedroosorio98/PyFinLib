@@ -7,6 +7,9 @@ from pandas_datareader import data as dt
 import yfinance as yf
 import quandl as qdl
 import pandas_datareader as pdr
+from statsmodels.graphics.tsaplots import plot_pacf
+from scipy import stats 
+import statsmodels.api as sm
 
 def sharpe_ratio(rets,rf=0,periods_per_year=252):
     if isinstance(rets,pd.Series) or isinstance(rets,pd.DataFrame):
@@ -340,3 +343,45 @@ def ew_weighted_weights(rets,reb_days=30,leverage=1):
     else:
         raise TypeError("This function is supposed to receive a pd.DataFrame or pd.Series object.")
         
+def plot_log_vol_rets(rets,window=90):
+    if isinstance(rets,pd.Series):
+        performance = performance_index(rets)
+        log_vol = np.log((performance.pct_change().rolling(window=window).std()*(252**0.5))).dropna()
+        log_rets = np.log(1+performance.pct_change(window)).dropna()
+        corr = np.corrcoef(log_vol,log_rets)[0][1]
+        plt.figure(figsize=(16,6))
+        plt.plot(log_vol,label="Log Volatility")
+        plt.plot(log_rets,label="Log Returns")
+        plt.title(str(window) + " Volatility & " + str(window) + " Returns." + " Correlation = " + str(corr))
+        plt.legend()
+    else: 
+        raise TypeError("This function is supposed to receive a pd.Series object.")
+
+def plot_rets_autocorr(rets,lags=10):
+    if isinstance(rets,pd.Series):
+        plot_pacf(rets,lags=lags)
+    else:
+        raise TypeError("This function is supposed to receive a pd.Series object.")
+        
+def plot_rets_scatter(rets, lag=1):
+    if isinstance(rets,pd.Series):
+        plt.figure(figsize=(16,5))
+        pd.plotting.lag_plot(rets,lag=lag)
+        plt.xlabel("return t-"+str(lag),fontsize=12)
+        plt.ylabel("return t",fontsize=12)
+    else:
+        raise TypeError("This function is supposed to receive a pd.Series object.")
+        
+def linear_regression(x,y):
+    if isinstance(x,pd.Series) or isinstance(x,pd.DataFrame):
+        if isinstance(y,pd.Series) or isinstance(y,pd.DataFrame):
+            X1 = sm.add_constant(x)
+            reg = sm.OLS(y,X1).fit()
+            return reg
+        else: 
+            raise TypeError("This function is supposed to receive two pd.Series or pd.DataFrame objects.")
+    else: 
+        raise TypeError("This function is supposed to receive two pd.Series or pd.DataFrame objects.")
+        
+    
+    
